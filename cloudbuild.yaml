@@ -1,0 +1,21 @@
+# cloudbuild.yaml
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '--platform=linux/amd64', '-t', 'gcr.io/$PROJECT_ID/slack-arxiv-bot', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/slack-arxiv-bot']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - slack-arxiv-bot
+      - --image=gcr.io/$PROJECT_ID/slack-arxiv-bot
+      - --region=asia-northeast1
+      - --platform=managed
+      - --allow-unauthenticated
+      - --set-env-vars=SLACK_BOT_TOKEN=$(SLACK_BOT_TOKEN),OPENAI_API_KEY=$(OPENAI_API_KEY),SLACK_SIGNING_SECRET=$(SLACK_SIGNING_SECRET)
+
+timeout: 900s
