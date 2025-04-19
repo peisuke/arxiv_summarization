@@ -15,10 +15,6 @@ SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=SLACK_BOT_TOKEN)
 
-# リトライ検出用のイベントID記録セット（メモリ内）
-recent_event_ids = set()
-
-
 def verify_slack_request(headers, body):
     timestamp = headers.get("x-slack-request-timestamp")
     signature = headers.get("x-slack-signature")
@@ -38,14 +34,19 @@ def verify_slack_request(headers, body):
 
     return hmac.compare_digest(computed_signature, signature)
 
-
 @app.post("/")
 async def slack_webhook(request: Request):
     raw_body = await request.body()
     headers = request.headers
+    #print(headers)
 
     if not verify_slack_request(headers, raw_body.decode("utf-8")):
         return JSONResponse(content={"error": "unauthorized"}, status_code=401)
+
+    x_slack_retry_num = headers.get("x-slack-retry-num")
+    if x_slack_retry_num is not None:
+        print(f"Retry request: {x_slack_retry_num}")
+        return JSONResponse(content={"message": "Retry ignored"}, status_code=200)
 
     slack_event = await request.json()
 
@@ -53,19 +54,13 @@ async def slack_webhook(request: Request):
     if slack_event.get("type") == "url_verification":
         return JSONResponse(content={"challenge": slack_event["challenge"]})
 
-    # ✅ リトライイベントの重複防止（event_id を使う）
-    event_id = slack_event.get("event_id")
-    if event_id in recent_event_ids:
-        return {"message": "Duplicate event ignored"}
-    if event_id:
-        recent_event_ids.add(event_id)
-
     if "event" not in slack_event or slack_event["event"].get("type") != "app_mention":
         return {"message": "No action taken"}
 
     channel = slack_event["event"]["channel"]
     text = slack_event["event"].get("text", "")
     thread_ts = slack_event["event"].get("ts")
+    print(channel, text, thread_ts)
 
     response_text = handle_arxiv_request(text)
 
