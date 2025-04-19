@@ -4,6 +4,10 @@ SlackでarXivの論文URLをメンションすると、OpenAI APIを使って論
 
 ---
 
+## 出力例
+
+<img width="1027" alt="image" src="https://github.com/user-attachments/assets/73fc527b-f816-4fcf-8861-c9bb37233525" />
+
 ## ディレクトリ構成
 
 ```
