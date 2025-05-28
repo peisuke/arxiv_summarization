@@ -40,3 +40,11 @@ submit:
 test-local:
 	python test_main_local.py
 
+# 🔹 pytest でのテスト実行
+test:
+	pytest -v
+
+# 🔹 テスト用の依存関係をインストール
+install-test:
+	uv pip install -e ".[test]" --system
+
