@@ -57,7 +57,13 @@ def summarize(title, abstract):
     )
     resp = ret.choices[0].message.parsed
 
-    return f"*タイトル* :{title}\n*概要* :{resp.overview}\n*課題* :{resp.problem}\n*貢献* :{resp.contribution}\n*結論* :{resp.conclusion}"
+    # 1つ目の投稿: タイトル・課題・貢献・結論
+    first_post = f"*タイトル* :{title}\n*課題* :{resp.problem}\n*貢献* :{resp.contribution}\n*結論* :{resp.conclusion}"
+    
+    # 2つ目の投稿: 概要
+    second_post = f"*概要* :{resp.overview}"
+    
+    return first_post, second_post
 
 
 def handle_arxiv_request(text):
@@ -68,9 +74,9 @@ def handle_arxiv_request(text):
         if title and abstract:
             return summarize(title, abstract)
         else:
-            return "arXivから情報を取得できませんでした。"
+            return "arXivから情報を取得できませんでした。", None
     else:
         return (
             "フォーマットが正しくありません。\n"
             "`https://arxiv.org/abs/XXXX.XXXXX` という形式で送信してください。"
-        )
+        ), None
