@@ -47,4 +47,4 @@ submit:
 
 # 🔹 handler.py のローカルテスト
 test-local:
-	python test_main_local.py
+	python tests/test_handler.py
