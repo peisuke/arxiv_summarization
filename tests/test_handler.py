@@ -1,5 +1,5 @@
-# arxiv_slack_bot/test_main_local.py
-from handler import handle_arxiv_request
+from src.arxiv_slack_bot.handler import handle_arxiv_request
+
 
 if __name__ == "__main__":
     test_text = "https://arxiv.org/abs/2404.07979"

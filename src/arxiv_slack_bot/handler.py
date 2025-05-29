@@ -1,9 +1,8 @@
-# arxiv_slack_bot/handler.py
 import os
 import re
 import requests
-from pydantic import BaseModel
 import openai
+from .models import Result
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 openai.api_key = OPENAI_API_KEY
@@ -11,11 +10,6 @@ oai_clinet = openai.Client()
 
 arxiv_pattern = r"https?://(?:www\.)?arxiv\.org/abs/(\d{4}\.\d{4,5})(?:v\d+)?"
 
-class Result(BaseModel):
-    overview: str
-    problem: str
-    contribution: str
-    conclusion: str
 
 def fetch_arxiv_info(arxiv_id):
     """arXiv IDからタイトルとアブストラクトを取得する関数"""
@@ -39,6 +33,7 @@ def fetch_arxiv_info(arxiv_id):
 
         return title, abstract
     return None, None
+
 
 def summarize(title, abstract):
     system_prompt = (

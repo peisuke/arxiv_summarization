@@ -12,15 +12,21 @@ SlackでarXivの論文URLをメンションすると、OpenAI APIを使って論
 
 ```
 .
-├── main.py              # FastAPI アプリ (Slack webhook)
-├── handler.py           # arXiv 取得 & 要約ロジック
-├── test_main_local.py   # ローカルテスト用スクリプト
-├── pyproject.toml       # uv 用依存管理
-├── requirements.txt     # Cloud 用依存定義（make freeze で生成）
-├── Dockerfile           # Cloud Run 向けビルド
+├── src/
+│   └── arxiv_slack_bot/
+│       ├── __init__.py
+│       ├── main.py          # FastAPI アプリ (Slack webhook)
+│       ├── handler.py       # arXiv 取得 & 要約ロジック
+│       └── models.py        # Pydantic モデル定義
+├── tests/
+│   ├── __init__.py
+│   └── test_handler.py      # ローカルテスト用スクリプト
+├── pyproject.toml           # uv 用依存管理
+├── requirements.txt         # Cloud 用依存定義（make freeze で生成）
+├── Dockerfile               # Cloud Run 向けビルド
 ├── .dockerignore
-├── Makefile             # ビルド/デプロイ用コマンド
-└── cloudbuild.yaml      # Cloud Build 用設定
+├── Makefile                 # ビルド/デプロイ用コマンド
+└── cloudbuild.yaml          # Cloud Build 用設定
 ```
 
 ---

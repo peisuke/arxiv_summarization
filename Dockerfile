@@ -10,7 +10,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # アプリコードをコピー
-COPY . .
+COPY src/ ./src/
+COPY pyproject.toml .
+
+# パッケージを開発モードでインストール
+RUN pip install -e .
 
 # FastAPIのサーバ起動（Cloud RunがPORT環境変数を提供）
-CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=8080"]
+CMD ["uvicorn", "src.arxiv_slack_bot.main:app", "--host=0.0.0.0", "--port=8080"]

@@ -1,7 +1,6 @@
-# arxiv_slack_bot/main.py
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from handler import handle_arxiv_request
+from .handler import handle_arxiv_request
 import os
 import hashlib
 import hmac
@@ -14,6 +13,7 @@ app = FastAPI()
 SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=SLACK_BOT_TOKEN)
+
 
 def verify_slack_request(headers, body):
     timestamp = headers.get("x-slack-request-timestamp")
@@ -33,6 +33,7 @@ def verify_slack_request(headers, body):
     ).hexdigest()
 
     return hmac.compare_digest(computed_signature, signature)
+
 
 @app.post("/")
 async def slack_webhook(request: Request):
