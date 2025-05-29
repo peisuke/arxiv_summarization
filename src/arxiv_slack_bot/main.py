@@ -63,15 +63,25 @@ async def slack_webhook(request: Request):
     thread_ts = slack_event["event"].get("ts")
     print(channel, text, thread_ts)
 
-    response_text = handle_arxiv_request(text)
+    first_post, second_post = handle_arxiv_request(text)
 
     try:
+        # 1つ目の投稿: タイトル・課題・貢献・結論
         client.chat_postMessage(
             channel=channel,
-            text=response_text,
+            text=first_post,
             thread_ts=thread_ts,
             reply_broadcast=True
         )
+        
+        # 2つ目の投稿: 概要（second_postがNoneでない場合のみ）
+        if second_post:
+            client.chat_postMessage(
+                channel=channel,
+                text=second_post,
+                thread_ts=thread_ts,
+                reply_broadcast=True
+            )
     except SlackApiError as e:
         print(f"Slack API error: {e}")
 
