@@ -5,6 +5,7 @@ include .env
 export
 
 IMAGE = gcr.io/$(PROJECT_ID)/$(SERVICE_NAME)
+CLOUD_BUILD_IMAGE=${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${SERVICE_NAME}
 
 # 🔹 ローカル開発用
 install:
@@ -32,9 +33,17 @@ deploy: build
 	  --allow-unauthenticated \
 	  --set-env-vars SLACK_BOT_TOKEN=$$SLACK_BOT_TOKEN,OPENAI_API_KEY=$$OPENAI_API_KEY,SLACK_SIGNING_SECRET=$$SLACK_SIGNING_SECRET
 
+create:
+	gcloud artifacts repositories create $(REPO_NAME) \
+  	--repository-format=docker \
+  	--location=${REGION} \
+  	--description="Arxiv Summarization Container Repository"
+
 # 🔹 Cloud Build で一括ビルド＆デプロイ
 submit:
-	gcloud builds submit --config cloudbuild.yaml
+	gcloud builds submit . \
+		--config cloudbuild.yaml \
+		--substitutions=_SERVICE_NAME=$(SERVICE_NAME),_REGION=$(REGION),_IMAGE=$(CLOUD_BUILD_IMAGE)
 
 # 🔹 handler.py のローカルテスト
 test-local:
@@ -47,4 +56,3 @@ test:
 # 🔹 テスト用の依存関係をインストール
 install-test:
 	uv pip install -e ".[test]" --system
-
