@@ -12,6 +12,7 @@ oai_clinet = openai.Client()
 arxiv_pattern = r"https?://(?:www\.)?arxiv\.org/abs/(\d{4}\.\d{4,5})(?:v\d+)?"
 
 class Result(BaseModel):
+    overview: str
     problem: str
     contribution: str
     conclusion: str
@@ -42,7 +43,8 @@ def fetch_arxiv_info(arxiv_id):
 def summarize(title, abstract):
     system_prompt = (
         "あなたは優秀な博士課程の研究員です。研究に関する深い洞察ができ、それを平易な言葉で表現することができます。"
-        "与えられた論文の概要に基づいて、文中に書かれている内容から課題・貢献・結論について簡潔かつ正確に述べてください。"
+        "与えられた論文の概要に基づいて、文中に書かれている内容から概要・課題・貢献・結論について簡潔かつ正確に述べてください。"
+        "概要は、どのような課題に対してどんな手段で解決したかについて150文字程度で記載してください。"
         "英語で表記するところのみ英語のままにしつつ、**日本語**に翻訳して回答してください。「ですます調」ではなく「である調」にして回答してください。"
     )
     message = (
@@ -60,7 +62,7 @@ def summarize(title, abstract):
     )
     resp = ret.choices[0].message.parsed
 
-    return f"*タイトル* :{title}\n*課題* ：{resp.problem}\n*貢献* :{resp.contribution}\n*結論* :{resp.conclusion}"
+    return f"*タイトル* :{title}\n*概要* :{resp.overview}\n*課題* :{resp.problem}\n*貢献* :{resp.contribution}\n*結論* :{resp.conclusion}"
 
 
 def handle_arxiv_request(text):
