@@ -1,0 +1,19 @@
+# Python関連キャッシュ
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 仮想環境
+.venv/
+
+# エディタやOS固有ファイル
+*.swp
+.DS_Store
+
+# Git関連
+.git/
+.gitignore
+
+# VS Code設定など
+.vscode/

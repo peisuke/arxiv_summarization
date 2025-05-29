@@ -1,21 +1,29 @@
 # cloudbuild.yaml
+substitutions:
+  _SERVICE_NAME: ""
+  _REGION: ""
+  _IMAGE: ""
+
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--platform=linux/amd64', '-t', 'gcr.io/$PROJECT_ID/slack-arxiv-bot', '.']
+    args: ['build', '--platform=linux/amd64', '-t', '${_IMAGE}', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/slack-arxiv-bot']
+    args: ['push', '${_IMAGE}']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
+    entrypoint: bash
     args:
-      - run
-      - deploy
-      - slack-arxiv-bot
-      - --image=gcr.io/$PROJECT_ID/slack-arxiv-bot
-      - --region=asia-northeast1
-      - --platform=managed
-      - --allow-unauthenticated
-      - --set-env-vars=SLACK_BOT_TOKEN=$(SLACK_BOT_TOKEN),OPENAI_API_KEY=$(OPENAI_API_KEY),SLACK_SIGNING_SECRET=$(SLACK_SIGNING_SECRET)
+      - -c
+      - |
+        gcloud run deploy ${_SERVICE_NAME} \
+          --image=${_IMAGE} \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --set-secrets="SLACK_BOT_TOKEN=${_SERVICE_NAME}-slackbot-token:latest" \
+          --set-secrets="OPENAI_API_KEY=${_SERVICE_NAME}-openai-api-key:latest" \
+          --set-secrets="SLACK_SIGNING_SECRET=${_SERVICE_NAME}-slack-signing-secret:latest"
 
 timeout: 900s
+
